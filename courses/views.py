@@ -2,9 +2,11 @@ from rest_framework import generics
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Course, Rating
 from .serializers import CourseSerializer, RatingSerializer
+from .permissions import IsAdminUser
 
 """
 API versão 1
@@ -50,6 +52,7 @@ API versão 2
 class CourseViewSet(viewsets.ModelViewSet):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    permission_classes = (IsAuthenticated, IsAdminUser)
 
     @action(detail=True, methods=['get'])
     def ratings(self, request, pk=None):
@@ -68,3 +71,4 @@ class CourseViewSet(viewsets.ModelViewSet):
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer
+    permission_classes = (IsAuthenticated, IsAdminUser)
