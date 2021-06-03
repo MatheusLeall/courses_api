@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django.db.models import Avg
+
 from .models import Course, Rating
 
 
@@ -20,13 +22,14 @@ class RatingSerializer(serializers.ModelSerializer):
         )
     
     def validate_rate(self, value):
-        if value in range(1, 6):
+        if value in range(1.0, 6.0):
             return value
         raise serializers.ValidationError('A avaliação precisa ser uma nota entre 1.0 e 5.0')
 
 
 class CourseSerializer(serializers.ModelSerializer):
     ratings = RatingSerializer(many=True, read_only=True)
+    rate_mean = serializers.SerializerMethodField()
     class Meta:
         model = Course
         fields = (
@@ -35,5 +38,13 @@ class CourseSerializer(serializers.ModelSerializer):
             'url',
             'created',
             'is_active',
+            'rate_mean',
             'ratings'
         )
+
+    def get_rate_mean(self, obj):
+        mean = obj.ratings.aggregate(Avg('rate')).get('rate__avg')
+
+        if mean is None:
+            return 0
+        return round(mean * 2) / 2
