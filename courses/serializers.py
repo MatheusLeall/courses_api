@@ -22,7 +22,7 @@ class RatingSerializer(serializers.ModelSerializer):
         )
     
     def validate_rate(self, value):
-        if value in range(1.0, 6.0):
+        if value in range(1, 6):
             return value
         raise serializers.ValidationError('A avaliação precisa ser uma nota entre 1.0 e 5.0')
 
